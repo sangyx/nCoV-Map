@@ -4,7 +4,7 @@
 
 本项目旨在为各种有利于抗击新型肺炎的应用提供简单框架。目前已实现简单的疫情演进地图(自2020年1月22日9点始)及资讯展示功能。应用示例如下：
 
-![site](nCoV-Map.png)
+![nCoV-Map.png](https://github.com/sangyx/nCoV-Map/blob/master/nCoV-Map.png)
 
 本项目遵循MIT License，您可以以任何方式在此基础上扩展您的应用。以下为一些可供参考的idea：
 
