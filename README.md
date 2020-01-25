@@ -4,9 +4,7 @@
 
 本项目旨在为各种有利于抗击新型肺炎的应用提供简单框架。目前已实现简单的疫情演进地图(自2020年1月22日9点始)及资讯展示功能。
 
-感谢[Lei Guo](https://github.com/Monster12138)提供部署：[示例网址](http://39.108.227.206:8088)
-
-界面：
+感谢[Lei Guo](https://github.com/Monster12138)提供部署：[示例网址](http://39.108.227.206:8088)。页面展示：
 
 <p align="center">
   <img src="nCoV-Map.png" alt="nCoV-Map.png">
