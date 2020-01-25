@@ -12,13 +12,13 @@ $(
 );
 
 function getHost() {
-    return window.location.host;
+    return document.location.protocol + "//" +window.location.host;
 }
 
 function updateOverall(){
     $.ajax({
         type: "GET",
-        url: "http://" + getHost() + "/overall",
+        url: getHost() + "/overall",
         dataType: 'json',
         success: function (result) {
             var t = new Date()
@@ -31,7 +31,7 @@ function updateOverall(){
 function updateNews(){
     $.ajax({
         type: "GET",
-        url: "http://" + getHost() + "/news",
+        url: getHost() + "/news",
         dataType: 'json',
         success: function (result) {
             news_html = ""
@@ -46,7 +46,7 @@ function updateNews(){
 function fetchData() {
     $.ajax({
         type: "GET",
-        url: "http://" + getHost() + "/map",
+        url: getHost() + "/map",
         dataType: 'json',
         success: function (result) {
             chart.setOption(result);
