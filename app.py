@@ -8,8 +8,6 @@ from pyecharts import options as opts
 
 app = Flask(__name__)
 
-provinces = ['北京市', '天津市', '上海市', '重庆市', '河北省', '山西省', '辽宁省', '吉林省', '黑龙江省', '江苏省', '浙江省', '安徽省', '福建省', '江西省', '山东省', '河南省', '湖北省', '湖南省', '广东省', '海南省', '四川省', '贵州省', '云南省', '陕西省', '甘肃省', '青海省', '台湾省', '内蒙古自治区', '广西壮族自治区', '西藏自治区', '宁夏回族自治区', '新疆维吾尔自治区', '香港', '澳门']
-
 def update_news():
     url = 'http://lab.isaaclin.cn/nCoV/api/news'
     news_data = []
@@ -30,45 +28,57 @@ def update_overall():
 
 def update_map(unit=3600 * 2):
     map_data = {}
-    start_time = 1579626000
+    start_time = 1579701600
     url = 'http://lab.isaaclin.cn/nCoV/api/province'
     params = {'country': '中国'}
     data = json.loads(requests.get(url, params=params).text)
 
-    visit = set()
     time_zone = set()
+    provinces = set()
     start_num = {}
     for r in data['results']:
-        if r['confirmed'] == '':
+        if 'confirmedCount' not in r:
             continue
+
         mtime = int(r['modifyTime']) / 1000
         if mtime < start_time:
             continue
-        time_str = time.strftime("%m-%d %H:%M", time.localtime(mtime - mtime % unit))
-        if time_str + r['provinceName'] in visit:
-            continue
-        visit.add(time_str + r['provinceName'])
-        time_zone.add(time_str)
-        if r['provinceName'] not in map_data:
-            map_data[r['provinceName']] = {}
-            start_num[r['provinceName']] = {
+
+        provinces.add(r['provinceShortName'])
+
+        if r['provinceShortName'] not in map_data:
+            map_data[r['provinceShortName']] = {}
+            start_num[r['provinceShortName']] = {
                 '确诊人数': 10000,
                 '治愈人数': 10000,
                 '死亡人数': 10000,
                 '疑似感染人数': 10000
             }
-        if time_str not in map_data[r['provinceName']]:
-            map_data[r['provinceName']][time_str] = {
-            }
-        map_data[r['provinceName']][time_str]['确诊人数'] = int(r['confirmed'])
-        map_data[r['provinceName']][time_str]['疑似感染人数'] =  0 if r['suspect'] == None else int(r['suspect'])
-        map_data[r['provinceName']][time_str]['治愈人数'] = int(r['cured'])
-        map_data[r['provinceName']][time_str]['死亡人数'] = int(r['death'])
 
-        start_num[r['provinceName']]['确诊人数'] = min(start_num[r['provinceName']]['确诊人数'], map_data[r['provinceName']][time_str]['确诊人数'])
-        start_num[r['provinceName']]['疑似感染人数'] = min(start_num[r['provinceName']]['疑似感染人数'], map_data[r['provinceName']][time_str]['疑似感染人数'])
-        start_num[r['provinceName']]['治愈人数'] = min(start_num[r['provinceName']]['治愈人数'], map_data[r['provinceName']][time_str]['治愈人数'])
-        start_num[r['provinceName']]['死亡人数'] = min(start_num[r['provinceName']]['死亡人数'], map_data[r['provinceName']][time_str]['死亡人数'])
+        time_str = time.strftime("%m-%d %H:%M", time.localtime(mtime - mtime % unit))
+        time_zone.add(time_str)
+
+        if time_str not in map_data[r['provinceShortName']]:
+            map_data[r['provinceShortName']][time_str] = {
+            }
+
+        map_data[r['provinceShortName']][time_str]['确诊人数'] = r['confirmedCount']
+        map_data[r['provinceShortName']][time_str]['疑似感染人数'] =  r['suspectedCount']
+        map_data[r['provinceShortName']][time_str]['治愈人数'] = r['curedCount']
+        map_data[r['provinceShortName']][time_str]['死亡人数'] = r['deadCount']
+
+        start_num[r['provinceShortName']]['确诊人数'] = min(start_num[r['provinceShortName']]['确诊人数'], r['confirmedCount'])
+        start_num[r['provinceShortName']]['疑似感染人数'] = min(start_num[r['provinceShortName']]['疑似感染人数'], r['suspectedCount'])
+        start_num[r['provinceShortName']]['治愈人数'] = min(start_num[r['provinceShortName']]['治愈人数'], r['curedCount'])
+        start_num[r['provinceShortName']]['死亡人数'] = min(start_num[r['provinceShortName']]['死亡人数'], r['deadCount'])
+
+    # 修正宁夏起始数量
+    start_num['宁夏'] = {
+        '确诊人数': 2,
+        '治愈人数': 0,
+        '死亡人数': 0,
+        '疑似感染人数': 0
+    }
 
     time_zone = sorted(list(time_zone))
     process_data = {}
@@ -80,40 +90,38 @@ def update_map(unit=3600 * 2):
             '死亡人数': [],
             '疑似感染人数': []
         }
+
         for p in provinces:
             if p not in map_data:
+                process_data[t]['确诊人数'] += [[p, start_num[p]['确诊人数']]]
+                process_data[t]['治愈人数'] += [[p, start_num[p]['治愈人数']]]
+                process_data[t]['死亡人数'] += [[p, start_num[p]['死亡人数']]]
+                process_data[t]['疑似感染人数'] += [[p, start_num[p]['疑似感染人数']]]
                 continue
-            if p == '黑龙江省':
-                np = '黑龙江'
-            elif p == '内蒙古自治区':
-                np = '内蒙古'
-            else:
-                np = p[: 2]
             if t in map_data[p]:
-                process_data[t]['确诊人数'] += [[np, map_data[p][t]['确诊人数']]]
-                process_data[t]['治愈人数'] += [[np, map_data[p][t]['治愈人数']]]
-                process_data[t]['死亡人数'] += [[np, map_data[p][t]['死亡人数']]]
-                process_data[t]['疑似感染人数'] += [[np, map_data[p][t]['疑似感染人数']]]
+                process_data[t]['确诊人数'] += [[p, map_data[p][t]['确诊人数']]]
+                process_data[t]['治愈人数'] += [[p, map_data[p][t]['治愈人数']]]
+                process_data[t]['死亡人数'] += [[p, map_data[p][t]['死亡人数']]]
+                process_data[t]['疑似感染人数'] += [[p, map_data[p][t]['疑似感染人数']]]
             else:
                 flag = i - 1
                 for j in range(i-1, -1, -1):
                     tj = time_zone[j]
                     if tj in map_data[p]:
-                        process_data[t]['确诊人数'] += [[np, map_data[p][tj]['确诊人数']]]
-                        process_data[t]['治愈人数'] += [[np, map_data[p][tj]['治愈人数']]]
-                        process_data[t]['死亡人数'] += [[np, map_data[p][tj]['死亡人数']]]
-                        process_data[t]['疑似感染人数'] += [[np, map_data[p][tj]['疑似感染人数']]]
+                        process_data[t]['确诊人数'] += [[p, map_data[p][tj]['确诊人数']]]
+                        process_data[t]['治愈人数'] += [[p, map_data[p][tj]['治愈人数']]]
+                        process_data[t]['死亡人数'] += [[p, map_data[p][tj]['死亡人数']]]
+                        process_data[t]['疑似感染人数'] += [[p, map_data[p][tj]['疑似感染人数']]]
                         break
                     flag -= 1
                 if flag == -1:
-                    process_data[t]['确诊人数'] += [[np, start_num[p]['确诊人数']]]
-                    process_data[t]['治愈人数'] += [[np, start_num[p]['治愈人数']]]
-                    process_data[t]['死亡人数'] += [[np, start_num[p]['死亡人数']]]
-                    process_data[t]['疑似感染人数'] += [[np, start_num[p]['疑似感染人数']]]
+                    process_data[t]['确诊人数'] += [[p, start_num[p]['确诊人数']]]
+                    process_data[t]['治愈人数'] += [[p, start_num[p]['治愈人数']]]
+                    process_data[t]['死亡人数'] += [[p, start_num[p]['死亡人数']]]
+                    process_data[t]['疑似感染人数'] += [[p, start_num[p]['疑似感染人数']]]
     return process_data
 
 def confirmed_map(map_data):
-    # print(map_data)
     tl = Timeline()
     for t in map_data:
         map0 = (
@@ -137,11 +145,6 @@ def index():
 @app.route("/map")
 def get_map():
     map_data = update_map()
-    # tab = Tab()
-    # tab.add(confirmed_map(map_data), "确诊人数")
-    # tab.add(suspect_map(map_data), "疑似感染人数")
-    # tab.add(cured_map(map_data), "治愈人数")
-    # tab.add(death_map(map_data), "死亡人数")
     return confirmed_map(map_data).dump_options_with_quotes()
 
 @app.route("/news")
