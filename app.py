@@ -131,7 +131,7 @@ def confirmed_map(map_data):
             )
             .set_series_opts(label_opts=opts.LabelOpts(is_show=False))
             .set_global_opts(
-                visualmap_opts=opts.VisualMapOpts(max_=100),
+                visualmap_opts=opts.VisualMapOpts(max_=200),
                 legend_opts=opts.LegendOpts(is_show=False)
             )
         )
