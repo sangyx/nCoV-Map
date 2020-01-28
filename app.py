@@ -26,21 +26,21 @@ def update_overall():
     overall_data['time'] = time.strftime("%m-%d %H:%M", time.localtime(time.time()))
     return overall_data
 
-def update_map(unit=3600 * 2):
+def update_map(unit=3600 * 6):
     map_data = {}
     start_time = 1579701600
-    url = 'http://lab.isaaclin.cn/nCoV/api/province'
-    params = {'country': '中国'}
+    url = 'http://lab.isaaclin.cn/nCoV/api/area'
+    params = {'latest': '0'}
     data = json.loads(requests.get(url, params=params).text)
 
     time_zone = set()
     provinces = set()
     start_num = {}
     for r in data['results']:
-        if 'confirmedCount' not in r:
+        if 'confirmedCount' not in r or r['country'] != '中国':
             continue
 
-        mtime = int(r['modifyTime']) / 1000
+        mtime = int(r['updateTime']) / 1000
         if mtime < start_time:
             continue
 
@@ -68,8 +68,8 @@ def update_map(unit=3600 * 2):
         map_data[r['provinceShortName']][time_str]['死亡人数'] = r['deadCount']
 
         start_num[r['provinceShortName']]['确诊人数'] = min(start_num[r['provinceShortName']]['确诊人数'], r['confirmedCount'])
-        if r['suspectedCount'] != None:
-            start_num[r['provinceShortName']]['疑似感染人数'] = min(start_num[r['provinceShortName']]['疑似感染人数'], r['suspectedCount'])
+        # if r['suspectedCount'] != None:
+        start_num[r['provinceShortName']]['疑似感染人数'] = min(start_num[r['provinceShortName']]['疑似感染人数'], r['suspectedCount'])
         start_num[r['provinceShortName']]['治愈人数'] = min(start_num[r['provinceShortName']]['治愈人数'], r['curedCount'])
         start_num[r['provinceShortName']]['死亡人数'] = min(start_num[r['provinceShortName']]['死亡人数'], r['deadCount'])
 
@@ -123,7 +123,7 @@ def update_map(unit=3600 * 2):
     return process_data
 
 def confirmed_map(map_data):
-    tl = Timeline().add_schema(play_interval=800)
+    tl = Timeline().add_schema(play_interval=1000, is_loop_play=False)
     for t in map_data:
         map0 = (
             Map()
