@@ -12,7 +12,7 @@ def update_news():
     url = 'http://lab.isaaclin.cn/nCoV/api/news'
     news_data = []
     data = json.loads(requests.get(url).text)
-    for r in reversed(data['results'][-7:]):
+    for r in reversed(data['results'][-5:]):
         news_data.append({
             'title': r['title'],
             'sourceUrl': r['sourceUrl'],
@@ -68,7 +68,8 @@ def update_map(unit=3600 * 2):
         map_data[r['provinceShortName']][time_str]['死亡人数'] = r['deadCount']
 
         start_num[r['provinceShortName']]['确诊人数'] = min(start_num[r['provinceShortName']]['确诊人数'], r['confirmedCount'])
-        start_num[r['provinceShortName']]['疑似感染人数'] = min(start_num[r['provinceShortName']]['疑似感染人数'], r['suspectedCount'])
+        if r['suspectedCount'] != None:
+            start_num[r['provinceShortName']]['疑似感染人数'] = min(start_num[r['provinceShortName']]['疑似感染人数'], r['suspectedCount'])
         start_num[r['provinceShortName']]['治愈人数'] = min(start_num[r['provinceShortName']]['治愈人数'], r['curedCount'])
         start_num[r['provinceShortName']]['死亡人数'] = min(start_num[r['provinceShortName']]['死亡人数'], r['deadCount'])
 
@@ -122,7 +123,7 @@ def update_map(unit=3600 * 2):
     return process_data
 
 def confirmed_map(map_data):
-    tl = Timeline()
+    tl = Timeline().add_schema(play_interval=800)
     for t in map_data:
         map0 = (
             Map()
