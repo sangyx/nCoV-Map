@@ -22,7 +22,8 @@ def update_news():
 
 def update_overall():
     url = 'http://lab.isaaclin.cn/nCoV/api/overall'
-    overall_data = json.loads(requests.get(url).text)
+    params = {'latest': 1}
+    overall_data = json.loads(requests.get(url, params=params).text)
     overall_data['time'] = time.strftime("%m-%d %H:%M", time.localtime(time.time()))
     return overall_data
 
@@ -132,7 +133,7 @@ def confirmed_map(map_data):
             )
             .set_series_opts(label_opts=opts.LabelOpts(is_show=False))
             .set_global_opts(
-                visualmap_opts=opts.VisualMapOpts(max_=200),
+                visualmap_opts=opts.VisualMapOpts(max_=300),
                 legend_opts=opts.LegendOpts(is_show=False)
             )
         )
