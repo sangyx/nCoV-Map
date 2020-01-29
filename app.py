@@ -9,9 +9,9 @@ from pyecharts import options as opts
 app = Flask(__name__)
 
 def update_news():
-    url = 'http://lab.isaaclin.cn/nCoV/api/news'
+    url = 'https://lab.isaaclin.cn/nCoV/api/news'
     news_data = []
-    data = json.loads(requests.get(url).text)
+    data = json.loads(requests.get(url, verify=False).text)
     for r in reversed(data['results'][-5:]):
         news_data.append({
             'title': r['title'],
@@ -21,18 +21,18 @@ def update_news():
     return news_data
 
 def update_overall():
-    url = 'http://lab.isaaclin.cn/nCoV/api/overall'
+    url = 'https://lab.isaaclin.cn/nCoV/api/overall'
     params = {'latest': 1}
-    overall_data = json.loads(requests.get(url, params=params).text)
+    overall_data = json.loads(requests.get(url, params=params, verify=False).text)
     overall_data['time'] = time.strftime("%m-%d %H:%M", time.localtime(time.time()))
     return overall_data
 
 def update_map(unit=3600 * 6):
     map_data = {}
     start_time = 1579701600
-    url = 'http://lab.isaaclin.cn/nCoV/api/area'
+    url = 'https://lab.isaaclin.cn/nCoV/api/area'
     params = {'latest': '0'}
-    data = json.loads(requests.get(url, params=params).text)
+    data = json.loads(requests.get(url, params=params, verify=False).text)
 
     time_zone = set()
     provinces = set()
