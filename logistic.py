@@ -27,21 +27,22 @@ def update_overall():
     return overall_data
 
 
+
 def update_map(unit=3600 * 2):
     map_data = {}
     start_time = 1579701600
-    url = 'https://lab.isaaclin.cn/nCoV/api/province'
-    params = {'country': '中国'}
-    data = json.loads(requests.get(url, params=params).text)
+    url = 'https://lab.isaaclin.cn/nCoV/api/area?latest=0'
+    # params = {'country': '中国'}
+    data = json.loads(requests.get(url).text)
 
     time_zone = set()
     provinces = set()
     start_num = {}
     for r in data['results']:
-        if 'confirmedCount' not in r:
+        if 'confirmedCount' not in r or r['country']!="中国":
             continue
 
-        mtime = int(r['modifyTime']) / 1000
+        mtime = int(r['updateTime']) / 1000
         if mtime < start_time:
             continue
 
