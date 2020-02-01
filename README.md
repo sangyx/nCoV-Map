@@ -12,7 +12,10 @@
   <br />
   <h5>地级市疫情</h5>
   <img src="provinceMap.png" alt="provinceMap.png">
+  <br />
 </p>
+TODO:
+*优化全国疫情图的加载（由于一次性加载很多天的数据，导致页面加载过慢，后面考虑按需加载。）
 
 本项目遵循MIT License，您可以任何方式在此基础上扩展您的应用。以下为一些可供参考的idea：
 
