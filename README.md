@@ -33,4 +33,4 @@ TODO:
 * pyecharts
 * pypinyin
 ## 数据来源
-感谢[Isaac Lin](https://github.com/BlankerL)提供数据接口：<http://lab.isaaclin.cn/nCoV/>
+感谢[Isaac Lin](https://github.com/BlankerL)提供数据接口：<https://lab.isaaclin.cn/nCoV/>
