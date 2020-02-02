@@ -91,14 +91,33 @@
 
             </div>
         </div>
-    </div>
+        <!-- 模态框（Modal） -->
+        <div class="modal" id="chart-modal">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                     <div class="modal-header">
+                          <div style="float: left;width: 205px;font-size: 8px !important;line-height: 20px;" id="loading">
+                             <img style="float: left;height: 30px;width: 50px;" src="/loading.gif"  alt="加载中..."/>
+                          </div>
+                         <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                         <h4 class="modal-title" id="myModalLabel"></h4>
+
+                      </div>
+                    <iframe id="pmap-chart"  src="" frameborder="0" scrolling="no" style="width:750px; height:500px;" align="middle" >
+
+                    </iframe>
+
+                </div>
+
+            </div>
+        </div>
     <!--/main content wrapper-->
 
     <!--footer-->
-    <footer class="sticky-footer">
+    <footer class="sticky-footer" id="myFooter">
         <div class="container">
             <div class="text-center">
-                <small>Copyright &copy; <a href="https://github.com/sangyx/nCoV-Map">@sangyx</a> 2020 </small>
+                <small>Copyright &copy; <a href="https://github.com/howe829/nCoV-Map">@alexhowe</a> 2020 </small>
             </div>
         </div>
     </footer>
