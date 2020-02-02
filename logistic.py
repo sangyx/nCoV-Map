@@ -31,7 +31,7 @@ def update_overall():
 def update_map(unit=3600 * 2):
     map_data = {}
     start_time = 1579701600
-    url = 'https://lab.isaaclin.cn/nCoV/api/area?latest=0'
+    url = 'https://lab.isaaclin.cn/nCoV/api/area?latest=1'
     # params = {'country': '中国'}
     data = json.loads(requests.get(url).text)
 
