@@ -14,6 +14,7 @@
   <img src="provinceMap.png" alt="provinceMap.png">
   <br />
 </p>
+
 TODO:
 *优化全国疫情图的加载（由于一次性加载很多天的数据，导致页面加载过慢，后面考虑按需加载。）
 

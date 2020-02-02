@@ -7,7 +7,6 @@ from get_data import gen_datapair_by_prov, repair_name
 app = Flask(__name__)
 app.config['SEND_FILE_MAX_AGE_DEFAULT'] = timedelta(seconds=1)
 
-
 @app.route("/")
 def index():
     return render_template("index.html")
