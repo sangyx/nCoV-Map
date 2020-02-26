@@ -4,13 +4,14 @@ import requests
 from pyecharts.charts import Map, Timeline
 from pyecharts import options as opts
 
-
-
 def update_news():
-    url = 'https://lab.isaaclin.cn/nCoV/api/news'
+    url = 'https://lab.isaaclin.cn/nCoV/api/news?num=5'
     news_data = []
-    data = json.loads(requests.get(url).text)
-    for r in reversed(data['results'][-7:]):
+    res = requests.get(url)
+    while res.status_code != 200:
+        res = requests.get(url)
+    data = json.loads(res.text)
+    for r in reversed(data['results']):
         news_data.append({
             'title': r['title'],
             'sourceUrl': r['sourceUrl'],
@@ -21,11 +22,13 @@ def update_news():
 
 
 def update_overall():
-    url = 'https://lab.isaaclin.cn/nCoV/api/overall'
-    overall_data = json.loads(requests.get(url).text)
+    url = 'https://lab.isaaclin.cn/nCoV/api/overall?latest=1'
+    res = requests.get(url)
+    while res.status_code != 200:
+        res = requests.get(url)
+    overall_data = json.loads(res.text)
     overall_data['time'] = time.strftime("%m-%d %H:%M", time.localtime(time.time()))
     return overall_data
-
 
 
 def update_map(unit=3600 * 2):
@@ -33,13 +36,17 @@ def update_map(unit=3600 * 2):
     start_time = 1579701600
     url = 'https://lab.isaaclin.cn/nCoV/api/area?latest=1'
     # params = {'country': '中国'}
-    data = json.loads(requests.get(url).text)
+    res = requests.get(url)
+    while res.status_code != 200:
+        res = requests.get(url)
+    # print(res.status_code)
+    data = json.loads(res.text)
 
     time_zone = set()
     provinces = set()
     start_num = {}
     for r in data['results']:
-        if 'confirmedCount' not in r or r['country']!="中国":
+        if 'confirmedCount' not in r or r['countryName']!="中国":
             continue
 
         mtime = int(r['updateTime']) / 1000
@@ -51,10 +58,10 @@ def update_map(unit=3600 * 2):
         if r['provinceShortName'] not in map_data:
             map_data[r['provinceShortName']] = {}
             start_num[r['provinceShortName']] = {
-                '确诊人数': 10000,
-                '治愈人数': 10000,
-                '死亡人数': 10000,
-                '疑似感染人数': 10000
+                '确诊人数': 100000,
+                '治愈人数': 100000,
+                '死亡人数': 100000,
+                '疑似感染人数': 100000
             }
 
         time_str = time.strftime("%m-%d %H:%M", time.localtime(mtime - mtime % unit))
@@ -140,7 +147,7 @@ def confirmed_map(map_data):
             )
                 .set_series_opts(label_opts=opts.LabelOpts(is_show=False))
                 .set_global_opts(
-                visualmap_opts=opts.VisualMapOpts(max_=200),
+                visualmap_opts=opts.VisualMapOpts(max_=2000),
                 legend_opts=opts.LegendOpts(is_show=False)
             )
         )
